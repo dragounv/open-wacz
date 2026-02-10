@@ -12,6 +12,12 @@ SCRIPT_NAME = "extract_wacz.py"
 SCRIPT_VERSION = "1.0.0"
 
 
+class Arguments:
+    def __init__(self, namespace: argparse.Namespace):
+        self.wacz_path: str = namespace.file
+        self.target_path: str = namespace.target_directory
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Convert WACZ into directory structure."
@@ -172,12 +178,6 @@ class OptionalHarvestMetadata:
         self.main_page_date = None
         if "mainPageDate" in datapackage_json_object:
             self.main_page_date = datapackage_json_object["mainPageDate"]
-
-
-class Arguments:
-    def __init__(self, namespace: argparse.Namespace):
-        self.wacz_path: str = namespace.file
-        self.target_path: str = namespace.target_directory
 
 
 if __name__ == "__main__":
