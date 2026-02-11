@@ -38,6 +38,12 @@ def prepare_and_run(args: Arguments):
         # First extract name of harvest that will be used as name of root dir
         harvest_name = get_harvest_name(wacz_zip, harvest_metadata)
         harvest_path = os.path.join(args.target_path, harvest_name)
+
+        if os.path.exists(harvest_path):
+            print(f"Directory {harvest_path} already exists. Skipping.")
+            return
+
+        print(f"Extracting {args.wacz_path} into {harvest_path}.")
         create_directory_structure(harvest_path)
         extract_warcs(wacz_zip, harvest_path, harvest_name)
         # Skipped for now. Because we rename the archive file, the index will be invalid.
@@ -49,6 +55,7 @@ def prepare_and_run(args: Arguments):
             os.path.basename(args.wacz_path),
             harvest_name,
         )
+        print(f"Harvest {harvest_path} was created.")
 
 
 def create_info_file(
