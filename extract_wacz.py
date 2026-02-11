@@ -56,6 +56,7 @@ def create_info_file(
     harvest_name: str,
 ):
     info_file_path = os.path.join(harvest_path, "logs/crawl/info.txt")
+    # TODO: Get rid of datetime completely.
     today = datetime.now().isoformat()
     with open(info_file_path, "w", encoding="utf-8") as info_file:
         print("info: this harvest was extracted from WACZ file", file=info_file)
@@ -64,7 +65,7 @@ def create_info_file(
         print(f"conversion_date: {today}", file=info_file)
         print(f"harvest_name: {harvest_name}", file=info_file)
         print(
-            f"wacz_created: {harvest_metadata.required.full_date.isoformat()}",
+            f"wacz_created: {harvest_metadata.required.full_date}",
             file=info_file,
         )
         if harvest_metadata.optional.title:
@@ -154,8 +155,19 @@ class HarvestMetadata:
 class RequiredHarvestMetadata:
     def __init__(self, datapackage_json_object: dict):
         if "created" in datapackage_json_object:
-            self.full_date = datetime.fromisoformat(datapackage_json_object["created"])
-            self.date = self.full_date.strftime("%Y-%m")
+            # IMPORTANT: Avoid using datetime package for parsing iso format.
+            # Regardless of the method name 'fromisoformat', it can't parse iso format.
+            # There is no way to do that in the datetime package (or python standart library it seems)!
+            #
+            # self.full_date = datetime.fromisoformat(datapackage_json_object["created"])
+            # self.date = self.full_date.strftime("%Y-%m")
+
+            # Keep the string, it should be valid ISO format anyway
+            self.full_date: str = datapackage_json_object["created"]
+            # Time formatting via string manipulation (i really don't want to import external library)
+            # At least we know it should be an ISO formatted. So we can keep the year and month like this:
+            self.date = self.full_date[:7]
+            # 4 chars year + 1 char '-' + 2 chars moth = 7 chars
         else:
             raise ValueError(
                 "This script requires that the datapackage.json has a 'created' property, but it was not found!"
