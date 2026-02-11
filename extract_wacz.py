@@ -100,7 +100,7 @@ def extract_warcs(wacz_zip: ZipFile, harvest_path: str, harvest_name: str):
     extract_from_to(wacz_zip, ZIP_PATH, harvest_path)
     # Rename "data.warc.gz" to unique name.
     data_warc_path = os.path.join(harvest_path, "data.warc.gz")
-    correct_warc_path = os.path.join(harvest_path, harvest_name + "warc.gz")
+    correct_warc_path = os.path.join(harvest_path, harvest_name + ".warc.gz")
     if os.path.exists(data_warc_path):
         os.rename(data_warc_path, correct_warc_path)
 
