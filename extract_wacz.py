@@ -39,8 +39,10 @@ def prepare_and_run(args: Arguments):
         harvest_name = get_harvest_name(wacz_zip, harvest_metadata)
         harvest_path = os.path.join(args.target_path, harvest_name)
         create_directory_structure(harvest_path)
-        extract_warcs(wacz_zip, harvest_path)
-        extract_indexes(wacz_zip, harvest_path)
+        extract_warcs(wacz_zip, harvest_path, harvest_name)
+        # Skipped for now. Because we rename the archive file, the index will be invalid.
+        # TODO: Implement rewriting of the index files.
+        # extract_indexes(wacz_zip, harvest_path)
         create_info_file(
             harvest_metadata,
             harvest_path,
@@ -86,15 +88,21 @@ def create_info_file(
             )
 
 
+# Unused for now
 def extract_indexes(wacz_zip: ZipFile, harvest_path: str):
     ZIP_PATH = "indexes/"
     path = os.path.join(harvest_path, "logs/cdxj")
     extract_from_to(wacz_zip, ZIP_PATH, path)
 
 
-def extract_warcs(wacz_zip: ZipFile, harvest_path: str):
+def extract_warcs(wacz_zip: ZipFile, harvest_path: str, harvest_name: str):
     ZIP_PATH = "archive/"
     extract_from_to(wacz_zip, ZIP_PATH, harvest_path)
+    # Rename "data.warc.gz" to unique name.
+    data_warc_path = os.path.join(harvest_path, "data.warc.gz")
+    correct_warc_path = os.path.join(harvest_path, harvest_name + "warc.gz")
+    if os.path.exists(data_warc_path):
+        os.rename(data_warc_path, correct_warc_path)
 
 
 def extract_from_to(wacz_zip: ZipFile, from_path: str, to_path: str):
@@ -123,9 +131,11 @@ def create_directory_structure(harvest_path: str):
     cdx_path = os.path.join(logs_path, "cdx")
     os.mkdir(cdx_path)
 
+    # Skipped for now. Because we rename the archive file, the index will be invalid.
+    # TODO: Implement rewriting of the index files.
     # For cdxj indexes. Will be extracted from wacz.
-    cdxj_path = os.path.join(logs_path, "cdxj")
-    os.mkdir(cdxj_path)
+    # cdxj_path = os.path.join(logs_path, "cdxj")
+    # os.mkdir(cdxj_path)
 
     # Normally a gzipped logs from heritrix would be here. Instead create a small info file.
     crawl_path = os.path.join(logs_path, "crawl")
